@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <meta name="description" content="Use our Split PDFs tool to easily split any PDF document into individual pages. Download them as separate PDFs with just a click!"/>
+  <meta name="keywords" content="split PDF, PDF splitter, online PDF tool, PDF page split"/>
+  <title>Split PDF Tool | Free Online PDF Splitter</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
+  <link rel="stylesheet" href="Style/tools.css">
+  <link rel="stylesheet" href="Style/style.css">
+</head>
+<body>
+
+   <!-- Navbar -->
+   <nav class="navbar navbar-expand-lg text-white">
+    <div class="container">
+        <a class="navbar-brand" href="index.html">
+            <img src="imgs/Film Finder White Logo.png" width="160px" alt="Film Finder - Search & Discover Movies">
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar"
+            aria-controls="offcanvasNavbar" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item px-4"><a class="nav-link text-white" href="index.html">Home</a></li>
+                <li class="nav-item px-4"><a class="nav-link text-white" href="about.html">About Me</a></li>
+                <li class="nav-item px-4"><a class="nav-link text-white" href="Contact.html">Contact Me</a></li>
+                <li class="nav-item px-4"><a class="nav-link text-white" href="Tools.html">Tools</a></li>
+            </ul>
+        </div>
+    </div>
+  </nav>
+
+  <!-- Offcanvas Menu -->
+  <div class="offcanvas offcanvas-end text-bg-dark" tabindex="-1" id="offcanvasNavbar">
+    <div class="offcanvas-header d-flex justify-content-center w-100">
+        <h5 class="offcanvas-title m-0">
+            <img src="imgs/Film Finder White Logo.png" width="160px" alt="Film Finder Logo">
+        </h5>
+        <button type="button" class="btn-close btn-close-white position-absolute end-0 me-3"
+            data-bs-dismiss="offcanvas"></button>
+    </div>
+    <div class="offcanvas-body">
+        <ul class="navbar-nav ms-auto">
+            <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+            <li class="nav-item"><a class="nav-link" href="about.html">About Me</a></li>
+            <li class="nav-item"><a class="nav-link" href="Contact.html">Contact Us</a></li>
+        </ul>
+    </div>
+  </div>
+
+  <!-- Split PDF Tool Container -->
+  <div class="container mt-4" >
+    <h1 class="text-center" style="margin-top: 10%;">Split PDF Tool</h1>
+    <p class="text-center">Easily split a PDF document into separate pages. Download individual pages as PDFs!</p>
+  
+    <!-- File Input -->
+    <input id="pdf-input" type="file" class="form-control shadow-sm" accept=".pdf" aria-label="Upload a PDF file to split" />
+  
+<!-- Preview Section -->
+<div id="pdf-preview" class="pdf-preview bg-light p-2 mt-3 rounded shadow-sm" style="display: none;">
+  <ul class="list-inline d-flex " style="list-style: none; padding: 0; margin: 0; align-items: center;">
+    <li class="list-inline-item" style="font-size: 24px;">
+      <i class="fas fa-file-pdf" style="color: #e74c3c;"></i>
+    </li>
+    <li class="list-inline-item" style="font-size: 20px; font-weight: 500; color: #2c3e50; padding-left: 10px;">
+      <span id="file-name"></span>
+    </li>
+  </ul>
+</div>
+
+  
+    <!-- Split Button -->
+    <div class="text-center mt-4">
+      <button id="split-btn" class="btn-custom" disabled aria-label="Split the uploaded PDF">
+        <i class="fas fa-file-pdf"></i> Split PDF
+      </button>
+    </div>
+  
+    <!-- Download Section -->
+    <div class="text-center mt-4" id="download-section" style="display: none;">
+      <div id="download-links-container" class="d-flex flex-wrap justify-content-center gap-3"></div>
+    </div>
+  </div>
+  
+  <script>
+    // Split PDF TOOL JS
+    const pdfInput = document.getElementById("pdf-input");
+    const splitBtn = document.getElementById("split-btn");
+    const downloadSection = document.getElementById("download-section");
+    const downloadLinksContainer = document.getElementById("download-links-container");
+    const pdfPreview = document.getElementById("pdf-preview");
+    const fileNameDisplay = document.getElementById("file-name");
+
+    // When the user selects a PDF
+    pdfInput.addEventListener("change", function () {
+      const file = pdfInput.files[0];
+      if (file && file.type === "application/pdf") {
+        // Show file name and icon
+        pdfPreview.style.display = "block";
+        fileNameDisplay.textContent = file.name;
+        splitBtn.disabled = false;
+      } else {
+        pdfPreview.style.display = "none";
+        splitBtn.disabled = true;
+      }
+    });
+
+    // When the "Split PDF" button is clicked
+    splitBtn.addEventListener("click", async function () {
+      const file = pdfInput.files[0];
+      if (!file) {
+        alert("Please select a PDF file.");
+        return;
+      }
+
+      const arrayBuffer = await file.arrayBuffer();
+      const pdfDoc = await PDFLib.PDFDocument.load(arrayBuffer);
+      const numPages = pdfDoc.getPageCount();
+
+      downloadLinksContainer.innerHTML = ""; // Clear previous results
+
+      for (let i = 0; i < numPages; i++) {
+        const newPdf = await PDFLib.PDFDocument.create();
+        const [copiedPage] = await newPdf.copyPages(pdfDoc, [i]);
+        newPdf.addPage(copiedPage);
+
+        const pdfBytes = await newPdf.save();
+        const pdfBlob = new Blob([pdfBytes], { type: "application/pdf" });
+        const pdfUrl = URL.createObjectURL(pdfBlob);
+
+        const downloadCard = document.createElement("div");
+        downloadCard.classList.add("card", "p-3", "m-2", "col-md-3", "shadow");
+
+        downloadCard.innerHTML = `
+          <div class="text-center">
+            <i class="fas fa-file-pdf fa-3x text-danger"></i>
+            <h5 class="mt-2 text-black">Page ${i + 1}</h5>
+            <a href="${pdfUrl}" download="page-${i + 1}.pdf">Download</a>
+          </div>
+        `;
+        downloadLinksContainer.appendChild(downloadCard);
+      }
+
+      downloadSection.style.display = "block";
+    });
+  </script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/font-awesome@5.15.3/js/all.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

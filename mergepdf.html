@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+  <!-- Page Title -->
+  <title>Merge PDFs Tool - BestToolKit4You | Free Online PDF Merger</title>
+
+  <!-- Bootstrap CSS for Styling -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
+  <link rel="stylesheet" href="Style/style.css">
+  <link rel="stylesheet" href="Style/tools.css">
+
+</head>
+<body>
+
+     <!-- Navbar -->
+     <nav class="navbar navbar-expand-lg text-white">
+      <div class="container">
+          <a class="navbar-brand" href="index.html">
+              <img src="imgs/Film Finder White Logo.png" width="160px" alt="Film Finder - Search & Discover Movies">
+          </a>
+          <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar"
+              aria-controls="offcanvasNavbar" aria-expanded="false" aria-label="Toggle navigation">
+              <span class="navbar-toggler-icon"></span>
+          </button>
+  
+          <div class="collapse navbar-collapse">
+              <ul class="navbar-nav">
+                  <li class="nav-item px-4"><a class="nav-link text-white" href="index.html">Home</a></li>
+                  <li class="nav-item px-4"><a class="nav-link text-white" href="about.html">About Me</a></li>
+                  <li class="nav-item px-4"><a class="nav-link text-white" href="Contact.html">Contact Me</a></li>
+                  <li class="nav-item px-4"><a class="nav-link text-white" href="Tools.html">Tools</a></li>
+              </ul>
+          </div>
+      </div>
+    </nav>
+  
+    <!-- Offcanvas Menu -->
+    <div class="offcanvas offcanvas-end text-bg-dark" tabindex="-1" id="offcanvasNavbar">
+      <div class="offcanvas-header d-flex justify-content-center w-100">
+          <h5 class="offcanvas-title m-0">
+              <img src="imgs/Film Finder White Logo.png" width="160px" alt="Film Finder Logo">
+          </h5>
+          <button type="button" class="btn-close btn-close-white position-absolute end-0 me-3"
+              data-bs-dismiss="offcanvas"></button>
+      </div>
+      <div class="offcanvas-body">
+          <ul class="navbar-nav ms-auto">
+              <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+              <li class="nav-item"><a class="nav-link" href="about.html">About Me</a></li>
+              <li class="nav-item"><a class="nav-link" href="Contact.html">Contact Us</a></li>
+          </ul>
+      </div>
+    </div>
+  <!-- Main Content Section -->
+  <div class="container mt-4">
+    <h1 class="text-center" style="margin-top: 10%;">Merge PDFs Online</h1>
+    <p class="text-center">Select multiple PDF files below, and click the button to merge them into one PDF. It's quick, easy, and free!</p>
+
+    <!-- PDF File Input -->
+    <input id="pdf-input" type="file" class="form-control" accept=".pdf" multiple />
+    <div class="pdf-file-preview" id="pdf-preview"></div>
+
+    <div class="text-center mt-4">
+      <button id="merge-btn" class="btn-custom">
+        <i class="fas fa-file-pdf"></i> Merge PDFs
+      </button>
+    </div>
+    
+    <!-- Download Section -->
+    <div class="text-center mt-4" id="download-section" style="display: none;">
+      <a id="download-link" href="#" class="btn btn-success w-100 p-3">
+        <i class="fas fa-download"></i> Download Merged PDF
+      </a>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script>
+    const pdfInput = document.getElementById("pdf-input");
+    const mergeBtn = document.getElementById("merge-btn");
+    const downloadSection = document.getElementById("download-section");
+    const downloadLink = document.getElementById("download-link");
+    const pdfPreview = document.getElementById("pdf-preview");
+
+    mergeBtn.addEventListener("click", async function() {
+      const files = pdfInput.files;
+      if (files.length < 2) {
+        alert("Please select at least two PDF files to merge.");
+        return;
+      }
+
+      const pdfDocs = [];
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const arrayBuffer = await file.arrayBuffer();
+        const pdfDoc = await PDFLib.PDFDocument.load(arrayBuffer);
+        pdfDocs.push(pdfDoc);
+      }
+
+      const mergedPdf = await PDFLib.PDFDocument.create();
+
+      for (const pdfDoc of pdfDocs) {
+        const copiedPages = await mergedPdf.copyPages(pdfDoc, pdfDoc.getPages().map((_, index) => index));
+        copiedPages.forEach(page => mergedPdf.addPage(page));
+      }
+
+      const mergedPdfBytes = await mergedPdf.save();
+
+      const mergedPdfBlob = new Blob([mergedPdfBytes], { type: 'application/pdf' });
+      const mergedPdfUrl = URL.createObjectURL(mergedPdfBlob);
+
+      downloadLink.href = mergedPdfUrl;
+      downloadLink.download = 'merged.pdf';
+      downloadSection.style.display = 'block';
+    });
+
+    pdfInput.addEventListener('change', function () {
+      const files = pdfInput.files;
+      pdfPreview.innerHTML = '';
+      if (files.length > 0) {
+        let previewText = '<strong>Selected Files:</strong><ul class="file-name-list">';
+        for (let i = 0; i < files.length; i++) {
+          previewText += `<li>${files[i].name}</li>`;
+        }
+        previewText += '</ul>';
+        pdfPreview.innerHTML = previewText;
+      }
+    });
+  </script>
+  
+  <!-- External Libraries -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/all.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
