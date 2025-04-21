@@ -1,0 +1,90 @@
+main {
+  padding: 20px 10px;
+}
+
+.tool-card {
+  padding: 8px;
+  width: 130px;
+  height: 100px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  flex-direction: column;
+  margin: 8px;
+  border-radius: 3px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  background-color: #ffffff;
+  overflow: hidden;
+}
+
+.tool-card i {
+  font-size: 40px;
+  color: transparent;
+  -webkit-text-stroke: 2px #00aaff;
+  margin-bottom: 8px;
+}
+
+.tool-card p {
+  font-weight: bold;
+  font-size: 12px;
+  color: #333;
+  margin: 0;
+}
+
+.tool-cards-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 16px;
+}
+
+a {
+  text-decoration: none;
+}
+
+@media (max-width: 768px) {
+  main {
+      padding: 30px;
+  }
+
+  .tool-card {
+      width: 100px;
+      height: 100px;
+  }
+}
+
+.btn-custom {
+  background-color: #2575fc;
+  color: white;
+  border: none;
+  padding: 12px 30px;
+  font-size: 1.1rem;
+  border-radius: 5px;
+  width: 100%;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-custom:hover {
+  background-color: #6a11cb;
+  transform: translateY(-2px);
+}
+
+.pdf-file-preview {
+  margin-top: 20px;
+}
+
+.file-name-list {
+  font-size: 1rem;
+  color: #333;
+}
+
+.file-name-list li {
+  list-style: none;
+  margin-bottom: 10px;
+  background: #f8f9fa;
+  padding: 10px;
+  border-radius: 5px;
+}
